@@ -20,7 +20,6 @@ import {
   PanelLeft,
 } from "lucide-react";
 import "./App.css";
-
 const API_BASE = "https://hiremeaiproject-backend.onrender.com";
 
 const seedChats = [
