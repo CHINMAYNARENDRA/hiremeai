@@ -175,7 +175,7 @@ def home():
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    resume_text=read_pdf(Path("my_resume.pdf"))
+    resume_text=read_pdf(Path("Chinmay.pdf"))
     resume=parse_resume(resume_text)
     answer=ask_candidate(request.question, resume)
     return {
