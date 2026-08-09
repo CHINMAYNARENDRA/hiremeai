@@ -24,8 +24,8 @@ if not GROQ_API_KEY:
 
 client = Groq(api_key=GROQ_API_KEY)
 
-# Current Groq production model
-MODEL = "llama-3.1-8b-instant"
+# Groq model
+MODEL = "openai/gpt-oss-120b"
 
 
 # =========================================================
@@ -85,14 +85,14 @@ class ChatRequest(BaseModel):
 
 
 # =========================================================
-# GLOBAL CURRENT RESUME
+# CURRENT RESUME
 # =========================================================
 
 current_resume: Resume | None = None
 
 
 # =========================================================
-# READ PDF
+# PDF EXTRACTION
 # =========================================================
 
 def read_pdf(file_path: Path) -> str:
@@ -114,7 +114,7 @@ def read_pdf(file_path: Path) -> str:
 
 
 # =========================================================
-# PARSE RESUME USING GROQ
+# RESUME PARSER
 # =========================================================
 
 def parse_resume(resume_text: str) -> Resume:
@@ -123,22 +123,43 @@ def parse_resume(resume_text: str) -> Resume:
 You are an expert resume parser.
 
 Extract information from the resume based on its meaning,
-not only exact section headings.
+not only based on exact section headings.
+
+Different resumes may use different headings.
+
+For example:
+
+- Experience
+- Professional Experience
+- Work History
+- Employment
+- Internships
+
+These may all contain relevant experience.
+
+Skills may also appear in:
+
+- Skills section
+- Work experience
+- Internships
+- Projects
+- Certifications
 
 Return ONLY valid JSON matching this schema:
 
 {json.dumps(resume_schema, indent=2)}
 
-Rules:
+Important rules:
 
 1. Do not invent information.
-2. If a value is unavailable, return null.
+2. If a value is not available, return null.
 3. If a list has no information, return an empty list.
 4. Include internships inside experiences.
 5. Extract skills mentioned across the entire resume.
-6. Extract projects mentioned in the resume.
-7. Extract certifications mentioned in the resume.
-8. Keep the information faithful to the resume.
+6. Extract projects mentioned across the entire resume.
+7. Extract certifications mentioned across the entire resume.
+8. Keep all information faithful to the resume.
+9. Do not assume information that is not explicitly present.
 """
 
     user_prompt = f"""
@@ -175,7 +196,7 @@ Parse the following resume:
     except json.JSONDecodeError as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Resume parsing returned invalid JSON: {str(e)}",
+            detail=f"Resume parser returned invalid JSON: {str(e)}",
         )
 
     try:
@@ -195,27 +216,32 @@ def ask_candidate(question: str, resume: Resume) -> str:
 
     system_prompt = f"""
 You are an AI assistant representing a job candidate
-during a job interview.
+during a professional job interview.
 
-Below is the candidate's resume information:
+Here is the candidate's resume information:
 
 {resume.model_dump_json(indent=2)}
 
 Rules:
 
 1. Answer ONLY using information available in the resume.
-2. Never invent experience, skills, companies, projects,
-   education, certifications, or achievements.
-3. If the requested information is not available,
-   say exactly:
+2. Never invent skills, companies, projects, education,
+   certifications, experience, achievements, or technologies.
+3. If information is unavailable, say:
 
 "I don't have enough information to answer that."
 
 4. Answer professionally.
 5. Answer naturally as if the candidate is speaking.
-6. Keep answers concise but useful.
-7. For interview questions, answer in first person.
-8. Do not mention that you are an AI unless specifically asked.
+6. Answer in first person.
+7. Keep answers concise but informative.
+8. For "Tell me about yourself", give a strong
+   interview-style introduction using the candidate's
+   education, skills, projects, experience and certifications
+   when available.
+9. For technical questions, mention only technologies and
+   concepts present in the resume.
+10. Do not mention that you are an AI unless specifically asked.
 """
 
     response = client.chat.completions.create(
@@ -257,7 +283,6 @@ async def upload_resume(file: UploadFile = File(...)):
 
     global current_resume
 
-    # Check file type
     if not file.filename:
         raise HTTPException(
             status_code=400,
@@ -272,7 +297,6 @@ async def upload_resume(file: UploadFile = File(...)):
 
     try:
 
-        # Read uploaded file
         file_bytes = await file.read()
 
         if not file_bytes:
@@ -281,7 +305,7 @@ async def upload_resume(file: UploadFile = File(...)):
                 detail="Uploaded PDF is empty.",
             )
 
-        # Save temporarily
+        # Create temporary PDF
         with tempfile.NamedTemporaryFile(
             delete=False,
             suffix=".pdf",
@@ -292,7 +316,7 @@ async def upload_resume(file: UploadFile = File(...)):
 
         try:
 
-            # Extract PDF text
+            # Extract text
             resume_text = read_pdf(temp_path)
 
             if not resume_text.strip():
@@ -306,7 +330,7 @@ async def upload_resume(file: UploadFile = File(...)):
 
         finally:
 
-            # Delete temporary PDF
+            # Delete temporary file
             if temp_path.exists():
                 temp_path.unlink()
 
@@ -368,7 +392,7 @@ def chat(request: ChatRequest):
 
 
 # =========================================================
-# RUN LOCALLY
+# LOCAL RUN
 # =========================================================
 
 if __name__ == "__main__":
