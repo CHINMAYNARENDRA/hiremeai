@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import "./App.css";
 
-const API_BASE = "/api";
+const API_BASE = "https://hiremeai-srml.onrender.com";
 
 const seedChats = [
   {
@@ -216,7 +216,6 @@ export default function App() {
     <div className="app">
       {sidebarOpen && <div className="overlay" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Hidden file input shared by sidebar upload tile + composer plus button */}
       <input
         ref={fileInputRef}
         type="file"
