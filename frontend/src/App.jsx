@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import "./App.css";
 
-const API_BASE = "https://hiremeai-backend-xyvz.onrender.com";
+const API_BASE = "https://hiremeaiproject-backend.onrender.com";
 
 const seedChats = [
   {
