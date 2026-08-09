@@ -78,6 +78,9 @@ class ChatRequest(BaseModel):
 
 current_resume: Resume | None = None
 
+# Default resume already present in backend folder
+DEFAULT_RESUME_PATH = Path(__file__).parent / "Chinmay.pdf"
+
 
 # =========================================================
 # ASK CANDIDATE
@@ -99,7 +102,7 @@ Rules:
 2. Never hallucinate.
 
 3. If information is unavailable,
-say
+   say
 
 "I don't have enough information to answer that."
 
@@ -244,6 +247,57 @@ def read_pdf(file_path: Path):
 
 
 # =========================================================
+# LOAD DEFAULT RESUME
+# =========================================================
+
+def load_default_resume():
+
+    global current_resume
+
+    if not DEFAULT_RESUME_PATH.exists():
+
+        print(
+            f"Default resume not found: {DEFAULT_RESUME_PATH}"
+        )
+
+        return
+
+    try:
+
+        print(
+            f"Loading default resume: {DEFAULT_RESUME_PATH}"
+        )
+
+        resume_text = read_pdf(DEFAULT_RESUME_PATH)
+
+        if not resume_text.strip():
+
+            print("Default resume PDF is empty.")
+
+            return
+
+        current_resume = parse_resume(resume_text)
+
+        print("Default Chinmay.pdf loaded successfully.")
+
+    except Exception as e:
+
+        print(
+            f"Failed to load default resume: {e}"
+        )
+
+
+# =========================================================
+# STARTUP
+# =========================================================
+
+@app.on_event("startup")
+def startup_event():
+
+    load_default_resume()
+
+
+# =========================================================
 # HOME
 # =========================================================
 
@@ -252,7 +306,8 @@ def home():
 
     return {
         "message": "HireMeAI Backend is running!",
-        "status": "healthy"
+        "status": "healthy",
+        "resume_loaded": current_resume is not None
     }
 
 
@@ -266,12 +321,14 @@ async def upload_resume(file: UploadFile = File(...)):
     global current_resume
 
     if not file.filename:
+
         raise HTTPException(
             status_code=400,
             detail="No file selected."
         )
 
     if not file.filename.lower().endswith(".pdf"):
+
         raise HTTPException(
             status_code=400,
             detail="Only PDF files are supported."
@@ -280,6 +337,7 @@ async def upload_resume(file: UploadFile = File(...)):
     file_bytes = await file.read()
 
     if not file_bytes:
+
         raise HTTPException(
             status_code=400,
             detail="Uploaded PDF is empty."
@@ -295,11 +353,13 @@ async def upload_resume(file: UploadFile = File(...)):
         ) as temp_file:
 
             temp_file.write(file_bytes)
+
             temp_path = Path(temp_file.name)
 
         resume_text = read_pdf(temp_path)
 
         if not resume_text.strip():
+
             raise HTTPException(
                 status_code=400,
                 detail="Could not extract text from this PDF."
@@ -326,6 +386,7 @@ async def upload_resume(file: UploadFile = File(...)):
     finally:
 
         if temp_path and temp_path.exists():
+
             temp_path.unlink()
 
 
