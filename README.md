@@ -1,57 +1,45 @@
-# HireMeAI
+# HireMeAI 🤖
 
-HireMeAI is an AI-powered interview assistant that answers interview questions on behalf of a candidate based on their uploaded resume. The project combines a FastAPI backend, a React frontend, and Groq-powered AI responses to create a smart resume-based interview chatbot.
+HireMeAI is an AI-powered interview assistant that answers interview questions based on a candidate's resume. It uses **React**, **FastAPI**, and **Groq LLM** to provide personalized interview responses.
 
-## Features
+## 🚀 Live Demo
 
-* Upload resume and use it as context for interview answers
-* AI-generated responses tailored to the candidate profile
-* FastAPI backend for request handling
-* React frontend for user interaction
-* Groq integration for fast LLM responses
+https://hiremeaiproject-frontend.onrender.com
 
-## Tech Stack
+## ✨ Features
 
-**Frontend**
+* 📄 Resume upload
+* 🤖 AI-powered interview chatbot
+* 🧠 Resume-based answers
+* 💬 Interactive chat interface
+* ⚡ Fast AI responses using Groq
+* 🌐 Deployed on Render
 
-* React
-* Vite
-* JavaScript
+## 🛠️ Tech Stack
 
-**Backend**
+* **Frontend:** React.js, Vite, JavaScript, CSS
+* **Backend:** Python, FastAPI
+* **AI:** Groq API / LLM
+* **Deployment:** Render
+* **Tools:** Git, GitHub, VS Code
 
-* FastAPI
-* Python
+## 📁 Project Structure
 
-**AI / LLM**
-
-* Groq API
-
-**Other Tools**
-
-* Uvicorn
-* Pydantic
-* Python package management with `pyproject.toml`
-
-## Project Structure
-
-```bash
+```text
 hiremeai/
 ├── backend/
 │   ├── main.py
-│   ├── requirements.txt
-│   └── Chinmay.pdf
+│   └── requirements.txt
 ├── frontend/
 │   ├── src/
 │   ├── public/
-│   ├── package.json
-│   └── vite.config.js
+│   └── package.json
 ├── main.py
 ├── pyproject.toml
 └── README.md
 ```
 
-## Setup Instructions
+## ⚙️ Run Locally
 
 ### Backend
 
@@ -69,36 +57,31 @@ npm install
 npm run dev
 ```
 
-## Environment Variables
+## 🔐 Environment Variables
 
-Create a `.env` file in the backend if your app needs API keys:
+Create a `.env` file and add your Groq API key:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
 ```
 
-## How It Works
+## 💡 How It Works
 
-1. User uploads a resume.
-2. Backend processes the resume content.
-3. Interview question is sent to the AI model.
-4. Model generates an answer based on the resume context.
-5. Response is shown in the React frontend.
+1. Upload your resume.
+2. Ask an interview question.
+3. HireMeAI uses your resume as context.
+4. Groq LLM generates a personalized answer.
+5. The answer is displayed in the chat interface.
 
-## Use Case
+## 🎯 Use Cases
 
-This project can be used as:
+* Interview preparation
+* Resume-based mock interviews
+* Placement preparation
+* HR and technical interview practice
 
-* A mock interview assistant
-* A resume-based answer generator
-* A candidate preparation tool for interviews
-
-## Notes
-
-* Make sure your API keys are configured correctly.
-* Ensure backend and frontend are running on the correct ports.
-* The repository currently does not include a detailed README, so this file adds basic project documentation.
-
-## Author
+## 👨‍💻 Author
 
 **Chinmay Narendra Patil**
+
+GitHub: https://github.com/CHINMAYNARENDRA
